@@ -30,11 +30,27 @@ resource "terraform_data" "mongodb" {
   }
 
   provisioner "remote-exec" {
-    inline = [
-      "chmod +x /tmp/bootstrap.sh",
-      "sudo sh /tmp/bootstrap.sh mongodb"
-    ]
+  inline = [
+    # Enable EPEL and install ansible-core on RHEL 9
+    "sudo dnf install -y epel-release",
+    "sudo dnf install -y ansible-core",
+    
+    # Print ansible version to confirm it's installed
+    "ansible --version",
+    
+    # Fix script line endings and execute
+    "sed -i 's/\\r//' /tmp/bootstrap.sh",
+    "chmod +x /tmp/bootstrap.sh",
+    "sudo sh /tmp/bootstrap.sh mongodb"
+  ]
   }
+  # provisioner "remote-exec" {
+  #   inline = [
+
+  #     "chmod +x /tmp/bootstrap.sh",
+  #     "sudo sh /tmp/bootstrap.sh" 
+  #   ]
+  # }
 }
 
 # resource "aws_instance" "redis" {
